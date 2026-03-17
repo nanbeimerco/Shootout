@@ -1,6 +1,7 @@
-<img width="2880" height="1800" alt="スクリーンショット (194)" src="https://github.com/user-attachments/assets/ce2543d1-b376-40f2-b843-d2b868683dca" />
-<img width="2880" height="1800" alt="スクリーンショット (193)" src="https://github.com/user-attachments/assets/28aa8606-770b-4a97-875f-c7f2d6409952" />
-<img width="2880" height="1800" alt="スクリーンショット (192)" src="https://github.com/user-attachments/assets/487d36af-1407-43d2-a3d2-1c8fe7e0266c" />
+<img width="2880" height="1800" alt="スクリーンショット (194)" src="https://github.com/user-attachments/assets/0a7e86b9-ca17-45ad-90c4-d169d4dbabac" />
+<img width="2880" height="1800" alt="スクリーンショット (193)" src="https://github.com/user-attachments/assets/0bcc7bb9-bc96-4875-a86c-42eb4d1ee880" />
+<img width="2880" height="1800" alt="スクリーンショット (192)" src="https://github.com/user-attachments/assets/14dacb52-eb4a-4ba8-b99b-f4418559a0fc" />
+
 EQ Blind Test v2 - Persistent Edition
 
 This is a professional-grade Equalizer Blind Test application built with Electron. It allows users to compare different EQ profiles blindly and rank them using the Glicko-1 rating system.
