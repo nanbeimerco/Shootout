@@ -1,6 +1,6 @@
-<img width="2880" height="1800" alt="スクリーンショット (194)" src="https://github.com/user-attachments/assets/0a7e86b9-ca17-45ad-90c4-d169d4dbabac" />
-<img width="2880" height="1800" alt="スクリーンショット (193)" src="https://github.com/user-attachments/assets/0bcc7bb9-bc96-4875-a86c-42eb4d1ee880" />
-<img width="2880" height="1800" alt="スクリーンショット (192)" src="https://github.com/user-attachments/assets/14dacb52-eb4a-4ba8-b99b-f4418559a0fc" />
+<img width="2880" height="1800" alt="スクリーンショット (197)" src="https://github.com/user-attachments/assets/62a07769-f0ba-4578-ba34-8f2b4802680a" />
+<img width="2880" height="1800" alt="スクリーンショット (196)" src="https://github.com/user-attachments/assets/5a68a85e-d44a-4c12-9aec-73c0e5fe320f" />
+<img width="2880" height="1800" alt="スクリーンショット (195)" src="https://github.com/user-attachments/assets/1c278110-c217-4a68-bf8e-3dd1a90f4e52" />
 
 EQ Blind Test v2 - Persistent Edition
 
