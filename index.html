@@ -158,24 +158,10 @@
             background-color: rgba(150, 150, 150, 0.6) !important;
         }
 
-        /* Custom Hover Titlebar */
-        #titlebar-container {
-            position: fixed; top: 0; left: 0; right: 0; height: 12px; z-index: 99999;
-        }
-        #custom-titlebar {
-            position: absolute; top: 0; left: 0; right: 0; height: 32px;
-            background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(4px);
-            display: flex; justify-content: space-between; align-items: center; padding: 0 16px;
-            transform: translateY(-100%); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            -webkit-app-region: drag; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        #titlebar-container:hover #custom-titlebar {
-            transform: translateY(0);
-        }
+        /* Window Control Buttons */
         .titlebar-btn {
-            -webkit-app-region: no-drag; background: transparent; border: none; color: #a1a1aa;
-            width: 32px; height: 24px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.1s; outline: none;
+            background: transparent; border: none; color: #a1a1aa;
+            transition: all 0.1s; outline: none; cursor: pointer;
         }
         .titlebar-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
         .titlebar-btn.close:hover { background: #ef4444; color: #fff; }
@@ -183,22 +169,6 @@
 </head>
 
 <body>
-    <div id="titlebar-container">
-        <div id="custom-titlebar">
-            <div style="font-size: 11px; font-weight: bold; color: #a1a1aa;">Shootout</div>
-            <div style="display: flex; gap: 4px;">
-                <button class="titlebar-btn" onclick="require('electron').ipcRenderer.send('window-min')">
-                    <svg width="10" height="10" viewBox="0 0 10 10"><path fill="currentColor" d="M1,4.5 h8 v1 h-8 z"/></svg>
-                </button>
-                <button class="titlebar-btn" onclick="require('electron').ipcRenderer.send('window-max')">
-                    <svg width="10" height="10" viewBox="0 0 10 10"><path fill="currentColor" d="M1,1 h8 v8 h-8 z M2,2 v6 h6 v-6 z"/></svg>
-                </button>
-                <button class="titlebar-btn close" onclick="require('electron').ipcRenderer.send('window-close')">
-                    <svg width="10" height="10" viewBox="0 0 10 10"><path fill="currentColor" d="M1,1 l8,8 m0,-8 l-8,8" stroke="currentColor" stroke-width="1.5"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
     <div id="root"></div>
 
     <script type="text/babel">
@@ -1142,14 +1112,26 @@
 
             return (
                 <div className="min-h-screen pb-20 bg-background text-foreground">
-                    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border text-sm">
-                        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border text-sm" style={{ WebkitAppRegion: 'drag' }}>
+                        <div className="w-full px-4 h-16 flex items-center justify-between">
                             <div className="flex items-center"><img src="./icon.svg" alt="App Icon" className="h-8 w-auto rounded-md" /></div>
-                            <nav className="flex gap-4 font-medium items-center">
+                            <nav className="flex gap-4 font-medium items-center" style={{ WebkitAppRegion: 'no-drag' }}>
                                 <button onClick={() => setMode('setup')} className={mode === 'setup' ? 'text-primary' : 'text-muted-foreground'}>Setup</button>
                                 <button onClick={() => { if (mode !== 'test') { if (currentPair && currentPair.hiddenA) setMode('test'); else startTestRound(false); } else setMode('test'); }} className={mode === 'test' ? 'text-primary' : 'text-muted-foreground'}>Test</button>
                                 <button onClick={() => setMode('results')} className={mode === 'results' ? 'text-primary' : 'text-muted-foreground'}>Results</button>
-                                <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors ml-2">{theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</button>
+                                <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors ml-2 mr-2">{theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</button>
+                                
+                                <div className="flex items-center gap-1 border-l border-border pl-4">
+                                    <button className="titlebar-btn" onClick={() => require('electron').ipcRenderer.send('window-min')} style={{ width: '32px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                                        <svg width="10" height="10" viewBox="0 0 10 10"><path fill="currentColor" d="M1,4.5 h8 v1 h-8 z"/></svg>
+                                    </button>
+                                    <button className="titlebar-btn" onClick={() => require('electron').ipcRenderer.send('window-max')} style={{ width: '32px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                                        <svg width="10" height="10" viewBox="0 0 10 10"><path fill="currentColor" d="M1,1 h8 v8 h-8 z M2,2 v6 h6 v-6 z"/></svg>
+                                    </button>
+                                    <button className="titlebar-btn close" onClick={() => require('electron').ipcRenderer.send('window-close')} style={{ width: '32px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                                        <svg width="10" height="10" viewBox="0 0 10 10"><path fill="currentColor" d="M1,1 l8,8 m0,-8 l-8,8" stroke="currentColor" strokeWidth="1.5"/></svg>
+                                    </button>
+                                </div>
                             </nav>
                         </div>
                     </header>
