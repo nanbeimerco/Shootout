@@ -678,13 +678,13 @@
 
                 if (isPlaying && !force) {
                     pauseTimeRef.current = (ctx.currentTime - startTimeRef.current) % song.duration;
-                    sourceNodeRef.current?.stop();
+                    try { sourceNodeRef.current?.stop(); } catch(e) {}
                     setIsPlaying(false); isPlayingRef.current = false;
                     cancelAnimationFrame(animationRef.current);
                     return;
                 }
 
-                sourceNodeRef.current?.stop();
+                try { sourceNodeRef.current?.stop(); } catch(e) {}
                 const source = ctx.createBufferSource();
                 source.buffer = song.buffer;
                 source.loop = true;
@@ -739,13 +739,14 @@
             };
 
             const handleVote = (vote) => {
-                sourceNodeRef.current?.stop();
+                try { sourceNodeRef.current?.stop(); } catch(e) {}
                 setIsPlaying(false); isPlayingRef.current = false;
                 cancelAnimationFrame(animationRef.current);
 
                 const duration = roundStartTime ? Date.now() - roundStartTime : null;
                 const pA = eqProfiles.find(p => p.id === currentPair.hiddenA);
                 const pB = eqProfiles.find(p => p.id === currentPair.hiddenB);
+                if (!pA || !pB) return startTestRound(true);
                 const score = vote === 'A' ? 1 : vote === 'B' ? 0 : 0.5;
                 const upA = calculateRatingUpdate(pA, pB, score);
                 const upB = calculateRatingUpdate(pB, pA, 1 - score);
@@ -800,6 +801,7 @@
                 const [id1, id2] = q.shift(); setTestQueue(q);
                 const p1 = eqProfiles.find(p => p.id === id1);
                 const p2 = eqProfiles.find(p => p.id === id2);
+                if (!p1 || !p2) return startTestRound(next);
                 await Promise.all([calculateLoudnessCompensation(p1, song), calculateLoudnessCompensation(p2, song)]);
                 const isRev = Math.random() > 0.5;
                 setCurrentPair({ hiddenA: isRev ? id2 : id1, hiddenB: isRev ? id1 : id2 });
@@ -810,11 +812,16 @@
             const updateBand = (pid, i, f, v) => setEqProfiles(p => p.map(pr => pr.id !== pid ? pr : { ...pr, bands: pr.bands.map((b, idx) => idx === i ? { ...b, [f]: f === 'type' ? v : parseFloat(v) } : b), rawCode: serializeToAPO({ ...pr, bands: pr.bands.map((b, idx) => idx === i ? { ...b, [f]: f === 'type' ? v : parseFloat(v) } : b) }) }));
             const addBand = (pid) => setEqProfiles(p => p.map(pr => pr.id !== pid ? pr : { ...pr, bands: [...pr.bands, { freq: 1000, gain: 0, q: 1, type: 'peaking' }], rawCode: serializeToAPO({ ...pr, bands: [...pr.bands, { freq: 1000, gain: 0, q: 1, type: 'peaking' }] }) }));
             const removeBand = (pid, i) => setEqProfiles(p => p.map(pr => pr.id !== pid ? pr : { ...pr, bands: pr.bands.filter((_, idx) => idx !== i), rawCode: serializeToAPO({ ...pr, bands: pr.bands.filter((_, idx) => idx !== i) }) }));
-            const toggleProfileEnabled = (pid) => setEqProfiles(p => p.map(pr => pr.id !== pid ? pr : { ...pr, enabled: pr.enabled === false ? true : false }));
+            const toggleProfileEnabled = (pid) => {
+                setEqProfiles(p => p.map(pr => pr.id !== pid ? pr : { ...pr, enabled: pr.enabled === false ? true : false }));
+                setTestQueue([]);
+            };
 
             const executeReset = () => {
                 setHistory([]);
                 setEqProfiles(p => p.map(x => ({ ...x, rating: 1500, rd: 350, vol: 0.06, wins: 0, battles: 0, draws: 0, perSongRatings: {} })));
+                setTestQueue([]);
+                setCurrentPair({ hiddenA: null, hiddenB: null });
                 setIsResetConfirming(false);
             };
 
@@ -1249,8 +1256,12 @@
                                                 const data = { name: f.name.replace(/\.[^/.]+$/, ""), rawCode: text, ...parseEqualizerAPO(text) };
                                                 setEqProfiles(prev => [...prev, { ...data, id: Date.now().toString() + Math.random(), rating: 1500, rd: 350, vol: 0.06, wins: 0, battles: 0, draws: 0, enabled: true, perSongRatings: {} }]);
                                             }
+                                            setTestQueue([]);
                                         }} className="hidden" /></label>
-                                        <button onClick={() => setEqProfiles(p => [...p, { id: Date.now().toString(), name: 'New Profile', rawCode: '', bands: [], preamp: 0, rating: 1500, rd: 350, vol: 0.06, wins: 0, battles: 0, draws: 0, enabled: true, perSongRatings: {} }])} className="btn bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-xs flex items-center gap-2"><Plus size={12} /> New</button>
+                                        <button onClick={() => {
+                                            setEqProfiles(p => [...p, { id: Date.now().toString(), name: 'New Profile', rawCode: '', bands: [], preamp: 0, rating: 1500, rd: 350, vol: 0.06, wins: 0, battles: 0, draws: 0, enabled: true, perSongRatings: {} }]);
+                                            setTestQueue([]);
+                                        }} className="btn bg-primary text-primary-foreground px-3 py-1.5 rounded-md text-xs flex items-center gap-2"><Plus size={12} /> New</button>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 gap-4">
@@ -1264,7 +1275,7 @@
                                                         <button onClick={() => setEditorModes(v => ({ ...v, [p.id]: 'text' }))} className={`p-1.5 rounded-md ${editorModes[p.id] !== 'visual' ? 'bg-background shadow' : 'text-muted-foreground'} `}><FileText size={14} /></button>
                                                         <button onClick={() => setEditorModes(v => ({ ...v, [p.id]: 'visual' }))} className={`p-1.5 rounded-md ${editorModes[p.id] === 'visual' ? 'bg-background shadow' : 'text-muted-foreground'} `}><Sliders size={14} /></button>
                                                     </div>
-                                                    <button onClick={() => setEqProfiles(prev => prev.filter(pr => pr.id !== p.id))} className="text-muted-foreground hover:text-destructive p-1"><Trash2 size={14} /></button>
+                                                    <button onClick={() => { setEqProfiles(prev => prev.filter(pr => pr.id !== p.id)); setTestQueue([]); }} className="text-muted-foreground hover:text-destructive p-1"><Trash2 size={14} /></button>
                                                 </div>
                                             </div>
                                             {editorModes[p.id] === 'visual' ? (
